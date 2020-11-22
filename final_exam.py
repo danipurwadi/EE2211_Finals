@@ -13,6 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
+import math
 import numpy as np
 from colorama import Fore
 from colorama import Style
@@ -82,15 +83,123 @@ def main():
             polynomial_regression("non-ridge", "classification")
         
         if inp =='41':
-            text = "Polynomial Regression with Ridge Regression"
+            text = "Polynomial Classification with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             polynomial_regression("ridge", "classification")
+        
+        if inp =='5':
+            text = "Performing Gradient Descent"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            gradient_descent()
+        
+        if inp =='6':
+            text = "Misclassification Rate"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            misclassification_tree()
             
     except EOFError:
         main()
     except KeyboardInterrupt:
         main()
 
+def misclassification_tree():
+    root_gini = 0
+    root_entropy = 0
+    root_miss = 0
+
+    over_gini = 0
+    over_entropy = 0
+    over_miss = 0
+    gini_lst = []
+    entropy_lst = []
+    miss_lst = []
+    total = []
+    total_leaves = []
+    
+    print("Please input Leaf Distribution")
+    leaves = matrix_converter()
+    
+    root_status = input("Add root? (y/n)\n")
+    
+    if root_status == "y":
+        root_gini = 1
+        root_entropy = 0
+        root_miss = 1
+        root = []
+        print("Please input Root Distribution")
+        roots = matrix_converter()
+        sum_roots = sum(roots[0])
+        for a in range (len(roots[0])):
+            p = roots[0][a] / sum_roots
+            root.append(p)
+            root_gini -= p**2
+            if p == 0:
+                root_entropy -= 0
+            else:
+                root_entropy -= p * math.log2(p)
+        root_miss -= max(root)
+    
+    for i in range (len(leaves)):
+        gini = 1
+        entropy = 0
+        miss = 1
+        leaf = []
+        total.append(np.sum(leaves[i]))
+        for j in range (len(leaves[0])):
+            p = leaves[i][j] / total[i]
+            leaf.append(p)
+            
+            gini -= p**2
+            if p == 0:
+                entropy -= 0
+            else:
+                entropy -= p * math.log2(p)         
+        miss -= max(leaf)
+        total_leaves.append(leaf)
+        gini_lst.append(gini)
+        entropy_lst.append(entropy)
+        miss_lst.append(miss)
+    
+    for k in range (len(leaves)):
+        over_gini += (total[k] / sum(total)) * gini_lst[k]
+        over_entropy += (total[k] / sum(total)) * entropy_lst[k]
+        over_miss += (total[k] / sum(total)) * miss_lst[k]
+        
+    text = "\nSummary Page"
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+    
+    print("\nroot gini: " + str(root_gini))
+    print("\ngini: " + str(gini_lst))
+    print("\noverall gini: " + str(over_gini))
+    print("\ngini improvement: " + str(over_gini - root_gini))
+    
+    print("\n-------")
+    print("\nroot entropy: " + str(root_entropy))   
+    print("\nentropy: " + str(entropy_lst))
+    print("\noverall entropy: " + str(over_entropy))
+    print("\nentropy improvement: " + str(over_entropy - root_entropy))
+    
+    print("\n-------")
+    print("\nroot missclass: " + str(root_miss))
+    print("\nmissclass: " + str(miss_lst))
+    print("\noverall missclass: " + str(over_miss))
+    print("\nmiss class improvement: " + str(over_miss - root_miss))
+        
+        
+    main()
+
+def gradient_descent():
+    eqn = lambda x : 4*x**3
+    x_init = int(input("Initial x value:\n"))
+    learning_rate = float(input("Learning rate:\n"))
+    iterations = int(input("Number of iterations:\n"))
+    
+    for i in range (iterations):
+        x_new = x_init - learning_rate * eqn(x_init)
+        print(x_new)
+        x_init = x_new
+    main()
+    
 def polynomial_regression(ridge, classification):
     try:
         det = None
@@ -130,17 +239,13 @@ def polynomial_regression(ridge, classification):
             lam = float(input("Value for Lambda: \n"))
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case... Using Primal Form")
-                col = X.shape[1]
-                I = np.ones((col,col))
-                reg = lam * I
+                reg = lam * np.eye(X.shape[1])
                 w = np.linalg.inv(X.T@X + reg)@X.T@y
                 
             elif len(X) < len(X[0]):
                 print("\nUnderdetermined Case... Using Dual Form")
-                row = X.shape[0]
-                I = np.ones((row,row))
-                reg = lam*I
-                w = X.T @ np.linalg.inv(X @ X.T + reg)@ y
+                reg = lam * np.eye(X.shape[0])
+                w = X.T @ np.linalg.inv(X @ X.T + reg) @ y
                 
             else:
                 print("\nEven-determined case")
@@ -151,7 +256,8 @@ def polynomial_regression(ridge, classification):
                     print(f'{Fore.RED}{Style.BRIGHT}{exception_type}{Style.RESET_ALL}')
                     main()
                 w = np.linalg.inv(X) @ y
-                
+        
+        
         if test_status == "y":
             print("Please input your test case:")
             X_test = matrix_converter()
@@ -166,12 +272,17 @@ def polynomial_regression(ridge, classification):
                 else:
                     print("Performing multi-class classification")
                     y_class_predict = [[1 if y == max(x) else 0 for y in x] for x in y_predict ]
-            mse_status = input("MSE? (y/n)\n")
-            if mse_status == "y":
-                print("Please input y true value:")
-                y_true = matrix_converter()
-                mse_value = mean_squared_error(y_true, y_predict)
             
+            mse_status = input("MSE? (y/n)\n")
+            if mse_status == "y" and classification == "regression":
+                print("Please input y test value:")
+                y_test = matrix_converter()
+                mse_value = mean_squared_error(y_test, y_predict)
+        
+        y_predict_train = X @ w
+        mse_train = mean_squared_error(y, y_predict_train)
+                                       
+                                       
         text = "\nSummary Page"
         print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
         print(f"w:\n{w}\n")
@@ -179,7 +290,8 @@ def polynomial_regression(ridge, classification):
         print(f"y_predict:\n{y_predict}\n")
         if classification == "classification":
             print(f"y_class_predict:\n{y_class_predict}")
-        print(f"mse:\n{mse_value}\n")
+        print(f"Train MSE:\n{mse_train}")
+        print(f"Test MSE:\n{mse_value}\n")
     
         main()
 
@@ -227,16 +339,12 @@ def linear_regression(ridge, classification):
             lam = float(input("Value for Lambda: \n"))
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case... Using Primal Form")
-                col = X.shape[1]
-                I = np.ones((col,col))
-                reg = lam * I
+                reg = lam * np.eye(X.shape[1])
                 w = np.linalg.inv(X.T@X + reg)@X.T@y
                 
             elif len(X) < len(X[0]):
                 print("\nUnderdetermined Case... Using Dual Form")
-                row = X.shape[0]
-                I = np.ones((row,row))
-                reg = lam*I
+                reg = lam * np.eye(X.shape[0])
                 w = X.T @ np.linalg.inv(X @ X.T + reg)@ y
                 
             else:
@@ -269,7 +377,10 @@ def linear_regression(ridge, classification):
                 print("Please input y true value:")
                 y_true = matrix_converter()
                 mse_value = mean_squared_error(y_true, y_predict)
-            
+        
+        y_predict_train = X @ w
+        mse_train = mean_squared_error(y, y_predict_train)
+        
         text = "\nSummary Page"
         print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
         print(f"w:\n{w}\n")
@@ -277,8 +388,9 @@ def linear_regression(ridge, classification):
         print(f"y_predict:\n{y_predict}\n")
         if classification == "classification":
             print(f"y_class_predict:\n{y_class_predict}")
-        print(f"mse:\n{mse_value}\n")
-    
+        
+        print(f"Train MSE:\n{mse_train}")
+        print(f"Test MSE:\n{mse_value}\n")    
         main()
 
     except EOFError:
