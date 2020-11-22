@@ -34,32 +34,52 @@ def main():
         if inp =='1':
             text = "Linear Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
-            linear_regression("non-ridge")
+            linear_regression("non-ridge", "regression")
             
-        if inp =='2':
+        if inp =='11':
             text = "Linear Regression with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
-            linear_regression("ridge")
+            linear_regression("ridge", "regression")
+        
+        if inp =='2':
+            text = "Linear Classification"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            linear_regression("non-ridge", "classification")
+        
+        if inp =='22':
+            text = "Linear Classification with Ridge Regression"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            linear_regression("ridge", "classification")
         
         if inp =='3':
             text = "Polynomial Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
-            polynomial_regression("non-ridge")
+            polynomial_regression("non-ridge", "regression")
             
-        if inp =='4':
+        if inp =='33':
             text = "Polynomial Regression with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
-            polynomial_regression("ridge")
+            polynomial_regression("ridge", "regression")
+        
+        if inp =='4':
+            text = "Polynomial Classification"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            polynomial_regression("non-ridge", "classification")
+        
+        if inp =='44':
+            text = "Polynomial Regression with Ridge Regression"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            polynomial_regression("ridge", "classification")
             
     except EOFError:
         main()
     except KeyboardInterrupt:
         main()
 
-def polynomial_regression(status):
+def polynomial_regression(ridge, classification):
     try:
         det = None
-        y_test = None
+        y_predict = None
         mse_value = None
         print("Please input matrix X")
         X = matrix_converter()
@@ -72,7 +92,7 @@ def polynomial_regression(status):
         X = poly.fit_transform(X)
         
         print(X)
-        if status == "non-ridge":
+        if ridge == "non-ridge":
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case")
                 w = np.linalg.inv(X.T @ X)@X.T@y
@@ -91,7 +111,7 @@ def polynomial_regression(status):
                     main()
                 w = np.linalg.inv(X) @ y
        
-        elif status == "ridge":
+        elif ridge == "ridge":
             lam = float(input("Value for Lambda: \n"))
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case... Using Primal Form")
@@ -116,26 +136,34 @@ def polynomial_regression(status):
                     print(f'{Fore.RED}{Style.BRIGHT}{exception_type}{Style.RESET_ALL}')
                     main()
                 w = np.linalg.inv(X) @ y
-               
+                
         if test_status == "y":
             print("Please input your test case:")
             X_test = matrix_converter()
             # Auto add bias as this is a polynomial regression
             X_test = poly.fit_transform(X_test)
             print(X_test)
-            y_test = X_test @ w
-            
+            y_predict = X_test @ w
+            if classification == "classification":
+                if (len(y_predict[0]) == 1):
+                    print("Performing classification of 2 classes")
+                    y_class_predict = np.sign(y_predict)
+                else:
+                    print("Performing multi-class classification")
+                    y_class_predict = [[1 if y == max(x) else 0 for y in x] for x in y_predict ]
             mse_status = input("MSE? (y/n)\n")
             if mse_status == "y":
                 print("Please input y true value:")
                 y_true = matrix_converter()
-                mse_value = mean_squared_error(y_true, y_test)
+                mse_value = mean_squared_error(y_true, y_predict)
             
         text = "\nSummary Page"
         print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
         print(f"w:\n{w}\n")
         print(f"Determinant of X:\n{det}\n")
-        print(f"y_test:\n{y_test}\n")
+        print(f"y_predict:\n{y_predict}\n")
+        if classification == "classification":
+            print(f"y_class_predict:\n{y_class_predict}")
         print(f"mse:\n{mse_value}\n")
     
         main()
@@ -145,10 +173,10 @@ def polynomial_regression(status):
     except KeyboardInterrupt:
         main()
 
-def linear_regression(status):
+def linear_regression(ridge, classification):
     try:
         det = None
-        y_test = None
+        y_predict = None
         mse_value = None
         print("Please input matrix X")
         X = matrix_converter()
@@ -162,7 +190,7 @@ def linear_regression(status):
             X = np.append(np.ones((len(X), 1)), X, axis=1)
             print(f'Your new X is:\n{X}\n')
         
-        if status == "non-ridge":
+        if ridge == "non-ridge":
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case")
                 w = np.linalg.inv(X.T @ X)@X.T@y
@@ -180,7 +208,7 @@ def linear_regression(status):
                     main()
                 w = np.linalg.inv(X) @ y
        
-        elif status == "ridge":
+        elif ridge == "ridge":
             lam = float(input("Value for Lambda: \n"))
             if len(X) > len(X[0]):
                 print("\nOverdetermined Case... Using Primal Form")
@@ -211,19 +239,29 @@ def linear_regression(status):
             X_test = matrix_converter()
             if bias_status == "y":
                 X_test = np.append(np.ones((len(X_test), 1)), X_test, axis=1)
-            y_test = X_test @ w
+            y_predict = X_test @ w
             
+            if classification == "classification":
+                if (len(y_predict[0]) == 1):
+                    print("Performing classification of 2 classes")
+                    y_class_predict = np.sign(y_predict)
+                else:
+                    print("Performing multi-class classification")
+                    y_class_predict = [[1 if y == max(x) else 0 for y in x] for x in y_predict ]
+                    
             mse_status = input("MSE? (y/n)\n")
             if mse_status == "y":
                 print("Please input y true value:")
                 y_true = matrix_converter()
-                mse_value = mean_squared_error(y_true, y_test)
+                mse_value = mean_squared_error(y_true, y_predict)
             
         text = "\nSummary Page"
         print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
         print(f"w:\n{w}\n")
         print(f"Determinant of X:\n{det}\n")
-        print(f"y_test:\n{y_test}\n")
+        print(f"y_predict:\n{y_predict}\n")
+        if classification == "classification":
+            print(f"y_class_predict:\n{y_class_predict}")
         print(f"mse:\n{mse_value}\n")
     
         main()
