@@ -15,6 +15,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
 import math
 import numpy as np
+import sympy
 from colorama import Fore
 from colorama import Style
 from sklearn.metrics import mean_squared_error
@@ -36,7 +37,7 @@ def main():
     inp = input("What do you want me to do?\n")
     try:
         # Matrix Inverse
-        if inp == '90' or inp == "inverse":
+        if inp == '01' or inp == "inverse":
             print(f"{Fore.GREEN}{Style.BRIGHT}Matrix Inverse{Style.RESET_ALL}")
             inv_input = matrix_converter()
             inv_matrix = inverse(inv_input)
@@ -44,12 +45,49 @@ def main():
             print(inv_matrix)
             main()
         
-        if inp =='91' or inp == "transpose":
+        if inp =='02' or inp == "transpose":
             text = "Transpose of matrix"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
             inp = matrix_converter()
             transposed = inp.T
             print(f"Transposed matrix:\n{transposed}")
+            main()  
+            
+        if inp =='03' or inp == "rank":
+            text = "Rank of matrix"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            rank = np.linalg.matrix_rank(inp)
+            print(f"Rank of matrix: {rank}")
+            main()
+            
+        if inp =='04' or inp == "dependence":
+            text = "Linear Independence of matrix"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            _, inds = sympy.Matrix(inp).T.rref()
+            print(f"Independent Rows: {inds}")
+            main()
+        
+        if inp =='05' or inp == "multiply":
+            text = "Multiplication of Matrices"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            print("Enter a second matrix")
+            inp2 = matrix_converter()
+            result = inp @ inp2
+            print(f"Result:\n{result}")
+            main()
+        
+        if inp =='06' or inp == "det":
+            text = "Matrix Determinant"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            result = np.linalg.det(inp)
+            if abs(result) < 0.000000000001:
+                result = 0
+                print("Matrix is non-invertible\n")
+            print(f"Result:\n{result}")
             main()
             
         # Find w given X and y
