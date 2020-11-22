@@ -4,10 +4,12 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
@@ -27,7 +29,7 @@ def main():
     inp = input("What do you want me to do?\n")
     try:
         # Matrix Inverse
-        if inp == '30' or inp == "inverse":
+        if inp == '90' or inp == "inverse":
             print(f"{Fore.GREEN}{Style.BRIGHT}Matrix Inverse{Style.RESET_ALL}")
             inv_input = matrix_converter()
             inv_matrix = inverse(inv_input)
@@ -35,7 +37,7 @@ def main():
             print(inv_matrix)
             main()
         
-        if inp =='31' or inp == "transpose":
+        if inp =='91' or inp == "transpose":
             text = "Transpose of matrix"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
             inp = matrix_converter()
@@ -59,7 +61,7 @@ def main():
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             linear_regression("non-ridge", "classification")
         
-        if inp =='22':
+        if inp =='21':
             text = "Linear Classification with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             linear_regression("ridge", "classification")
@@ -69,7 +71,7 @@ def main():
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             polynomial_regression("non-ridge", "regression")
             
-        if inp =='33':
+        if inp =='31':
             text = "Polynomial Regression with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             polynomial_regression("ridge", "regression")
@@ -79,7 +81,7 @@ def main():
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             polynomial_regression("non-ridge", "classification")
         
-        if inp =='44':
+        if inp =='41':
             text = "Polynomial Regression with Ridge Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             polynomial_regression("ridge", "classification")
