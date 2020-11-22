@@ -93,14 +93,71 @@ def main():
             gradient_descent()
         
         if inp =='6':
-            text = "Misclassification Rate"
+            text = "Classification Trees"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             misclassification_tree()
+        
+        if inp =='61':
+            text = "Regression Trees MSE"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            regression_tree()
             
     except EOFError:
         main()
     except KeyboardInterrupt:
         main()
+
+def regression_tree():
+    print("Please input Distribution Matrix")
+    mse_above = 0
+    mse_below = 0
+    mse_root = 0
+    y_above = []
+    y_below = []
+    y_list = []
+    matrix = matrix_converter()
+    
+    threshold = float(input("Enter desired threshold: \n"))
+    for i in range (len(matrix)):
+        y_list.append(matrix[i][1])
+        if matrix[i][0] > threshold:
+            y_above.append(matrix[i][1])
+        else:
+            y_below.append(matrix[i][1])
+            
+    ybar_above = sum(y_above) / len(y_above)
+    for j in range (len(y_above)):
+        mse_above += (y_above[j] - ybar_above)**2
+    mse_above = mse_above / len(y_above)
+    
+    ybar_below = sum(y_below) / len(y_below)
+    for k in range (len(y_below)):
+        mse_below += (y_below[k] - ybar_below)**2
+    mse_below = mse_below / len(y_below)
+    
+    mse_overall = len(y_above) / len(matrix) * mse_above + len(y_below) / len(matrix) * mse_below
+    
+    ybar_root = sum(y_list) / len(y_list)
+    
+    for a in range (len(y_list)):
+        mse_root += (y_list[a] - ybar_root)**2
+    mse_root = mse_root / len(y_list)
+    
+    text = "\nSummary Page"
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+    
+    print("\ny bar above: " + str(ybar_above))
+    print("\nmse above: " + str(mse_above))
+    
+    print("\ny bar below: " + str(ybar_below))
+    print("\nmse below: " + str(mse_below))
+    
+    print("\nmse overall: " + str(mse_overall))
+    
+    print("\n-------")
+    print("\nroot y bar: " + str(ybar_root))   
+    print("\nmse root: " + str(mse_root))
+    print("\nMSE improvement: " + str(mse_overall - mse_root))
 
 def misclassification_tree():
     root_gini = 0
@@ -184,8 +241,6 @@ def misclassification_tree():
     print("\nmissclass: " + str(miss_lst))
     print("\noverall missclass: " + str(over_miss))
     print("\nmiss class improvement: " + str(over_miss - root_miss))
-        
-        
     main()
 
 def gradient_descent():
