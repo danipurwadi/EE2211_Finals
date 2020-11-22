@@ -21,6 +21,12 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import train_test_split 
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
+from sklearn import tree
+import matplotlib.pyplot as plt
+
 
 #@TODO Plotting of graphs lmaoz
 #@TODO Linear Dependency
@@ -93,21 +99,155 @@ def main():
             gradient_descent()
         
         if inp =='6':
-            text = "Classification Trees"
+            text = "MSE for Classification"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             misclassification_tree()
         
         if inp =='61':
-            text = "Regression Trees MSE"
+            text = "MSE for Regression"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
-            regression_tree()
+            regression_tree_mse()
+        
+        if inp =='7':
+            text = "Regression Trees"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            decision_tree_regressor()
+        
+        if inp =='8':
+            text = "Classification Trees"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            decision_tree_classifier()
+        
+        if inp =='9':
+            text = "Evaluation Metric"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            evaluation_metric()
             
     except EOFError:
         main()
     except KeyboardInterrupt:
         main()
 
-def regression_tree():
+def evaluation_metric():
+    print("Please input matrix X")
+    matrix = matrix_converter()
+    if len(matrix) != 2:
+        pass
+    else:
+        TP = matrix[0][0]
+        FN = matrix[0][1]
+        
+        FP = matrix[1][0]
+        TN = matrix[1][1]
+        
+        tpr = TP/(TP + FN)
+        fnr = FN/(TP + FN)
+        
+        tnr = TN/(FP + TN)
+        fpr = FP/(FP + TN)
+        
+        accuracy = (TP + TN) / (TP + TN + FN + FP)
+        precision = TP / (TP + FP)
+    
+    text = "\nSummary Page"
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+    print(f"True Positive Rate: {tpr}\n")
+    print(f"False Negative Rate: {fnr}\n")
+    print(f"True Negative Rate: {tnr}\n")
+    print(f"False Positive Rate: {fpr}\n")
+    
+    print(f"Accuracy: {accuracy}\n")
+    print(f"Precision: {precision}\n")
+        
+    main()
+    
+def decision_tree_classifier():
+    try:
+        print("Please input matrix X")
+        X = matrix_converter()
+        print("Please input matrix Y")
+        y = matrix_converter()
+        criteria = input("Enter criteria of tree:\n")
+        max_dept = int(input("Enter maximum depth:\n"))
+        
+        test_status = input("Add Test cases? (y/n)\n")
+        
+        dtree = DecisionTreeClassifier(criterion=criteria, max_depth=max_dept)
+        dtree = dtree.fit(X, y) # reshape necessary because tree expects 2D array 
+        
+        y_trainpred = dtree.predict(X)
+        y_train_mse = mean_squared_error(y, y_trainpred)
+        
+        if test_status == "y":
+            print("Please input your test case:")
+            X_test = matrix_converter()
+            # Auto add bias as this is a polynomial regression
+            y_testpred = dtree.predict(X_test)
+            
+            mse_status = input("MSE? (y/n)\n")
+            if mse_status == "y":
+                print("Please input y test value:")
+                y_test = matrix_converter()
+                y_test_mse = mean_squared_error(y_test, y_testpred)
+        
+        text = "\nSummary Page"
+        print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+        print(f"Train MSE:\n{y_train_mse}\n")
+
+        if test_status == "y":
+            print(f"Test MSE:\n{y_test_mse}\n")
+        tree.plot_tree(dtree)
+        
+        main()
+    except EOFError:
+        main()
+    except KeyboardInterrupt:
+        main()
+        
+def decision_tree_regressor():
+    try:
+        print("Please input matrix X")
+        X = matrix_converter()
+        print("Please input matrix Y")
+        y = matrix_converter()
+        criteria = input("Enter criteria of tree:\n")
+        max_dept = int(input("Enter maximum depth:\n"))
+        
+        test_status = input("Add Test cases? (y/n)\n")
+        
+        dtree = DecisionTreeRegressor(criterion=criteria, max_depth=max_dept)
+        dtree.fit(X, y) # reshape necessary because tree expects 2D array 
+        y_trainpred = dtree.predict(X)
+        y_train_mse = mean_squared_error(y, y_trainpred)
+        
+        if test_status == "y":
+            print("Please input your test case:")
+            X_test = matrix_converter()
+            # Auto add bias as this is a polynomial regression
+            y_testpred = dtree.predict(X_test)
+            
+            mse_status = input("MSE? (y/n)\n")
+            if mse_status == "y":
+                print("Please input y test value:")
+                y_test = matrix_converter()
+                y_test_mse = mean_squared_error(y_test, y_testpred)
+        
+        text = "\nSummary Page"
+        print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+        print(f"Train MSE:\n{y_train_mse}\n")
+
+        if test_status == "y":
+            print(f"Test MSE:\n{y_test_mse}\n")
+            
+        plt.scatter(X, y, c='steelblue', s=20)
+        plt.plot(X, dtree, color='black', lw=2, label='scikit-learn')
+        main()
+    except EOFError:
+        main()
+    except KeyboardInterrupt:
+        main()
+
+def regression_tree_mse():
     print("Please input Distribution Matrix")
     mse_above = 0
     mse_below = 0
@@ -244,6 +384,8 @@ def misclassification_tree():
     main()
 
 def gradient_descent():
+    text = "REMINDER TO CHANGE EQUATION"
+    print(f"{Fore.RED}{Style.BRIGHT}{text}{Style.RESET_ALL}")
     eqn = lambda x : 4*x**3
     x_init = int(input("Initial x value:\n"))
     learning_rate = float(input("Learning rate:\n"))
