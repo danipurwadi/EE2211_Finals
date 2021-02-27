@@ -89,6 +89,32 @@ def main():
                 print("Matrix is non-invertible\n")
             print(f"Result:\n{result}")
             main()
+        
+        if inp =='07' or inp == "loss functions":
+            text = "Loss FUnctions"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            
+            ty = input("What type is this loss function:\n")
+            
+            if ty == 'logistics':
+                for i in range (len(inp)):
+                    for j in range (len(inp[0])):
+                        inp[i][j] = 1 / (1 + math.exp(-1 * inp[i][j]))
+            print(f"Result:\n{inp}")
+            main()
+            
+        if inp =='111' or inp == "asd":
+            text = "Loss FUnctions"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+            inp = matrix_converter()
+            remainder = (7 + inp[0][0] * 4 + inp[0][1] * 3 + 2 * inp[0][2]) % 9
+            if remainder == inp[0][3]:
+                print ("TRUEUEEUE")
+            else:
+                print("FASLEEE")
+            
+            main()
             
         # Find w given X and y
         if inp =='1':
@@ -160,12 +186,81 @@ def main():
             text = "Evaluation Metric"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
             evaluation_metric()
+        
+        if inp =='10':
+            text = "K Classification"
+            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")    
+            k_classification()
             
     except EOFError:
         main()
     except KeyboardInterrupt:
         main()
 
+def k_classification():
+    print("Please input the data values (format: [x,y]) ")
+    X = matrix_converter()
+    print(X)
+    print(X.shape)
+    print("Please input the matrix values (first row is x values, second row is y values)")
+    Centroids = matrix_converter()
+    print(Centroids)
+    
+    m=X.shape[0] #number of training examples
+    d=X.shape[1] #number of features. Here d=2
+    
+    n_iter = 100
+    n_iter = int(input("Initialise iterations: "))
+    K = len(Centroids)
+    for j in range(n_iter):
+        #Step 2.a: For each training example compute the euclidian distance from the centroid and assign the cluster based on the minimal distance
+        EuclidianDistance=np.array([]).reshape(m,0)
+        for k in range(K):
+            # Compute the distance between the kth centroid and every data point
+            tempDist=np.sum((X-Centroids[:,k])**2,axis=1)
+            # stack the K sets of Euclid distance in K columns
+            EuclidianDistance=np.c_[EuclidianDistance,tempDist]
+        # Center indicator: locate the column (argmin) that has the minimum distance    
+        C=np.argmin(EuclidianDistance,axis=1)+1
+        #Step 2.b: We need to regroup the data points based on the cluster index C and store in the Output dictionary and also compute the mean of separated clusters and assign it as new centroids. Y is a temporary dictionary which stores the solution for one particular iteration.
+        Y={}
+        for k in range(K):
+            # each Y[k]: array([], shape=(2, 0), dtype=float64)
+            Y[k+1]=np.array([]).reshape(d,0)
+        for i in range(m):
+            # Indicate and collect data X according to the Center indicator 
+            Y[C[i]]=np.c_[Y[C[i]],X[i]] #np.shape(Y[k])=(2, number of points nearest to kth center)     
+        for k in range(K):
+            Y[k+1]=Y[k+1].T # transpose the row-wise data to column-wise
+    
+        # Compute new centroids
+        for k in range(K):
+            Centroids[:,k]=np.mean(Y[k+1],axis=0)
+            print(Centroids)
+            print("--------")
+
+    Output=Y
+    plt.scatter(X[:,0],X[:,1],c='black',label='unclustered data')
+    plt.xlabel('$x_1$')
+    plt.ylabel('$x_2$')
+    plt.legend()
+    plt.title('Plot of data points')
+    plt.show()      
+    ## plot clusters
+    color=['red','blue','green','cyan','magenta']
+    labels=['cluster1','cluster2','cluster3','cluster4','cluster5']
+    for k in range(K):
+        plt.scatter(Output[k+1][:,0],Output[k+1][:,1],c=color[k],label=labels[k])
+    plt.scatter(Centroids[0,:],Centroids[1,:],s=300,c='yellow',label='Centroids')
+    plt.xlabel('$x_1$')
+    plt.ylabel('$x_2$')
+    plt.legend()
+    plt.show()      
+
+    text = "\nSummary Page"
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
+    print(f"Output is: {Output}\n")
+    
 def evaluation_metric():
     print("Please input matrix X")
     matrix = matrix_converter()
@@ -286,6 +381,7 @@ def decision_tree_regressor():
         main()
 
 def regression_tree_mse():
+    print("Input Type: [x,y], where x is the threshold indicator")
     print("Please input Distribution Matrix")
     mse_above = 0
     mse_below = 0
@@ -321,6 +417,18 @@ def regression_tree_mse():
         mse_root += (y_list[a] - ybar_root)**2
     mse_root = mse_root / len(y_list)
     
+    test_status = input("Add Test cases? (y/n)\n")
+    if test_status == 'y':
+        print("Please input your test case:")
+        x_test = matrix_converter()
+        if x_test > threshold:
+            y_test = ybar_above
+        else:
+            y_test = ybar_below
+    
+    print(y_above)
+    print("")
+    print(y_below)
     text = "\nSummary Page"
     print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
     
@@ -336,6 +444,10 @@ def regression_tree_mse():
     print("\nroot y bar: " + str(ybar_root))   
     print("\nmse root: " + str(mse_root))
     print("\nMSE improvement: " + str(mse_overall - mse_root))
+    print("\n-------")
+    if test_status == 'y':
+        print("\ny test: " + str(y_test))
+    main()
 
 def misclassification_tree():
     root_gini = 0
@@ -351,6 +463,7 @@ def misclassification_tree():
     total = []
     total_leaves = []
     
+    print("Input Type: [class 1, class 2, class 3], where one row is the breakdown of a leaf")
     print("Please input Leaf Distribution")
     leaves = matrix_converter()
     
@@ -608,10 +721,13 @@ def linear_regression(ridge, classification):
                     y_class_predict = [[1 if y == max(x) else 0 for y in x] for x in y_predict ]
                     
             mse_status = input("MSE? (y/n)\n")
-            if mse_status == "y":
+            if mse_status == "y" and classification == "regression":
                 print("Please input y true value:")
                 y_true = matrix_converter()
                 mse_value = mean_squared_error(y_true, y_predict)
+            elif mse_status == "y" and classification == "classification":
+                print("Please input y true value:")
+                y_true = matrix_converter()
         
         y_predict_train = X @ w
         mse_train = mean_squared_error(y, y_predict_train)
