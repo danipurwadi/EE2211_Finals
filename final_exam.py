@@ -83,7 +83,11 @@ def main():
             text = "Matrix Determinant"
             print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
             inp = matrix_converter()
-            result = np.linalg.det(inp)
+            try:
+                result = np.linalg.det(inp)
+            except:
+                print("Matrix is non invertible")
+                main()
             if abs(result) < 0.000000000001:
                 result = 0
                 print("Matrix is non-invertible\n")

@@ -94,7 +94,72 @@ Output:
 
 ### 04 Linear Independence
 Input: 
-- Any Matrix (see Section 3 for input guide)
+- Any Matrix
 
 Output: 
-- Return the rank of the input matrix
+- Return the independent rows of the input matrix
+
+### 05 Matrix Multiplication
+Input: 
+- First matrix
+- Second matrix 
+
+Output: 
+- Return the multiplication result of the 2 matrices
+
+### 06 Matrix Determinant
+Input: 
+- Any matrix
+
+Output: 
+- Determinant of the matrix (if available)
+- Print out 'non-invertible' if matrix is not invertible
+
+### 1 Linear Regression
+Input: 
+- Matrix X
+- Matrix Y
+- Bias (optional)
+- Test Cases Matrix (optional). Adding test case will automatically perform calculation using the w obtained to the test matrix.
+- Calculate MSE (only if test case is selected). Calculate the MSE of training and test result.
+
+Output: 
+- Status of matrix X (Under or over determined case)
+- w value
+- Determinant of matrix X
+- Prediction of y (if test case is given)
+- Training MSE
+- Test MSE (if test case is given)
+
+### 11 Linear Regression with ridge
+Input:
+- Same as Linear Regression, but with additional input for Lambda
+
+Output:
+- Same with Linear Regression
+
+### 2 Linear Classification
+Input: 
+- Matrix X
+- Matrix Y
+- Bias (optional)
+- Test Cases Matrix (optional). however, for classification you technically should have a test case.
+- Calculate MSE (only if test case is selected). Calculate the MSE of training and test result.
+
+Output: 
+- Status of matrix X (Under or over determined case)
+- Classification status (multi class or 2-class)
+- w value
+- Determinant of matrix X
+- Prediction of y (if test case is given)
+- Classification result
+- Training MSE
+- Test MSE (if test case is given)
+
+### 2 Linear Classification with ridge
+Input:
+- Same as Linear Classification, but with additional input for Lambda
+
+Output:
+- Same with Linear Classification
+
