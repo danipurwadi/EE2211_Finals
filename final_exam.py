@@ -29,7 +29,7 @@ from sklearn import tree
 import matplotlib.pyplot as plt
 
 
-#@TODO Plotting of graphs lmaoz
+#@TODO Plotting of graphs
 #@TODO Linear Dependency
 
 def main():
