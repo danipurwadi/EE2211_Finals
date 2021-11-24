@@ -104,18 +104,6 @@ def main():
             print(f"Result:\n{inp}")
             main()
             
-        if inp =='111' or inp == "asd":
-            text = "Loss FUnctions"
-            print(f"{Fore.GREEN}{Style.BRIGHT}{text}{Style.RESET_ALL}")
-            inp = matrix_converter()
-            remainder = (7 + inp[0][0] * 4 + inp[0][1] * 3 + 2 * inp[0][2]) % 9
-            if remainder == inp[0][3]:
-                print ("TRUEUEEUE")
-            else:
-                print("FASLEEE")
-            
-            main()
-            
         # Find w given X and y
         if inp =='1':
             text = "Linear Regression"
